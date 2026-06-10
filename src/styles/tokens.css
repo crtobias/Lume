@@ -1,0 +1,45 @@
+:root {
+  --color-bg-editor: #1e1e1e;
+  --color-bg-sidebar: #252526;
+  --color-bg-activity: #333333;
+  --color-bg-panel: #1e1e1e;
+  --color-bg-tab-inactive: #2d2d2d;
+  --color-bg-tab-active: #1e1e1e;
+  --color-bg-statusbar: #007acc;
+  --color-bg-statusbar-nofolder: #68217a;
+
+  --color-fg-default: #cccccc;
+  --color-fg-muted: #858585;
+  --color-fg-statusbar: #ffffff;
+
+  --color-border: #3e3e42;
+  --color-border-subtle: #2d2d30;
+  --color-divider: #1e1e1e;
+
+  --color-accent: #007acc;
+  --color-accent-hover: #094771;
+  --color-list-hover: #2a2d2e;
+  --color-list-focused: #094771;
+  --color-list-selected: #37373d;
+
+  --color-git-modified: #e2c08d;
+  --color-git-added: #81b88b;
+  --color-git-deleted: #c74e39;
+  --color-git-untracked: #73c991;
+  --color-git-renamed: #75beff;
+  --color-git-conflict: #e4676b;
+
+  --width-activity-bar: 48px;
+  --width-sidebar: 240px;
+  --height-statusbar: 22px;
+  --height-tab: 35px;
+  --height-panel: 240px;
+
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
+  --font-size-ui: 13px;
+  --font-size-mono: 13px;
+  --font-size-statusbar: 12px;
+
+  --duration-fast: 80ms;
+}

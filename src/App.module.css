@@ -1,0 +1,18 @@
+.app {
+  display: grid;
+  grid-template-columns: var(--width-activity-bar) var(--width-sidebar) 1fr;
+  grid-template-rows: 1fr var(--height-statusbar);
+  height: 100vh;
+  width: 100vw;
+  background: var(--color-bg-editor);
+}
+
+.main {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}

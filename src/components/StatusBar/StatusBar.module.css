@@ -1,0 +1,50 @@
+.bar {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  background: var(--color-bg-statusbar);
+  color: var(--color-fg-statusbar);
+  font-size: var(--font-size-statusbar);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  height: var(--height-statusbar);
+}
+
+.left, .right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sync {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 2px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  height: var(--height-statusbar);
+  line-height: var(--height-statusbar);
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.btnItem {
+  cursor: pointer;
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.itemActive {
+  background: rgba(255, 255, 255, 0.18);
+}

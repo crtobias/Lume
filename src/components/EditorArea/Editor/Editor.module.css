@@ -1,0 +1,14 @@
+.host {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-bg-editor);
+}
+
+.host :global(.cm-editor) {
+  height: 100%;
+}
+
+.host :global(.cm-editor.cm-focused) {
+  outline: none;
+}

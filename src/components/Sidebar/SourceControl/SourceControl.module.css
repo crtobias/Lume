@@ -1,0 +1,219 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 4px 8px 4px;
+}
+
+.placeholder {
+  padding: 8px 12px;
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-ui);
+}
+
+.repoBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+}
+
+.repoName {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repoActions {
+  display: flex;
+  gap: 2px;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--color-fg-muted);
+  border-radius: 3px;
+}
+
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-fg-default);
+}
+
+.commitInput {
+  margin: 0 4px;
+  padding: 6px 8px;
+  background: #3c3c3c;
+  color: var(--color-fg-default);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  resize: vertical;
+  min-height: 56px;
+}
+
+.commitInput:focus {
+  border-color: var(--color-accent);
+}
+
+.commitBtn {
+  margin: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 2px;
+  font-size: var(--font-size-ui);
+  transition: background var(--duration-fast);
+}
+
+.commitBtn:hover {
+  background: #1a8ad6;
+}
+
+.commitBtnDisabled {
+  background: #4a4a4a;
+  cursor: not-allowed;
+  color: var(--color-fg-muted);
+}
+
+.commitBtnDisabled:hover {
+  background: #4a4a4a;
+}
+
+.error {
+  margin: 0 8px;
+  padding: 6px 8px;
+  background: rgba(199, 78, 57, 0.12);
+  color: var(--color-git-conflict);
+  font-size: 11px;
+  border-radius: 2px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: var(--color-fg-default);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  user-select: none;
+}
+
+.sectionHeader:hover {
+  background: var(--color-list-hover);
+}
+
+.sectionTitle {
+  flex: 1;
+}
+
+.sectionCount {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--color-fg-default);
+  border-radius: 8px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  cursor: default;
+  color: var(--color-fg-default);
+  font-size: var(--font-size-ui);
+  position: relative;
+}
+
+.row:hover {
+  background: var(--color-list-hover);
+}
+
+.rowName {
+  grid-column: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowPath {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 10px;
+  color: var(--color-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+}
+
+.rowActions {
+  grid-column: 2;
+  display: none;
+  gap: 2px;
+}
+
+.row:hover .rowActions {
+  display: inline-flex;
+}
+
+.rowIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--color-fg-muted);
+  border-radius: 3px;
+}
+
+.rowIcon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-fg-default);
+}
+
+.badge {
+  grid-column: 3;
+  font-weight: 700;
+  font-size: 11px;
+  width: 18px;
+  text-align: center;
+}

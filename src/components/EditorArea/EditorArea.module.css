@@ -1,0 +1,30 @@
+.area {
+  background: var(--color-bg-editor);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-fg-muted);
+}
+
+.brand {
+  font-size: 56px;
+  font-weight: 200;
+  letter-spacing: 0.04em;
+  color: var(--color-fg-default);
+  opacity: 0.4;
+}
+
+.hint {
+  font-size: var(--font-size-ui);
+}
