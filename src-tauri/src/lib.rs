@@ -3,8 +3,8 @@ mod state;
 
 use commands::fs::{fs_read_dir, fs_read_file, fs_write_file};
 use commands::git::{
-    git_branches, git_checkout, git_commit, git_discard, git_fetch, git_pull, git_push,
-    git_stage, git_status, git_unstage,
+    git_branches, git_checkout, git_commit, git_discard, git_discover_repos, git_fetch,
+    git_file_at_head, git_pull, git_push, git_stage, git_status, git_unstage,
 };
 use commands::pty::{detect_shells, pty_kill, pty_resize, pty_spawn, pty_write};
 use state::AppState;
@@ -25,6 +25,8 @@ pub fn run() {
             pty_kill,
             detect_shells,
             git_status,
+            git_discover_repos,
+            git_file_at_head,
             git_stage,
             git_unstage,
             git_discard,

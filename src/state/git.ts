@@ -1,13 +1,32 @@
 import { create } from "zustand";
 import { ipc, type GitStatus } from "../lib/ipc";
 
+export interface RepoEntry {
+  path: string;
+  name: string;
+  status: GitStatus;
+}
+
+function basename(p: string): string {
+  const norm = p.replace(/[\\/]+$/g, "");
+  const idx = Math.max(norm.lastIndexOf("/"), norm.lastIndexOf("\\"));
+  return idx >= 0 ? norm.slice(idx + 1) : norm;
+}
+
 interface GitState {
-  status: GitStatus | null;
+  /** Discovered repositories under the open folder, each with its status. */
+  repos: RepoEntry[];
+  /** Cached repo paths so polling doesn't re-scan the filesystem. */
+  repoPaths: string[];
+  scannedRoot: string | null;
   loading: boolean;
-  commitMessage: string;
+  commitMessages: Record<string, string>;
   lastError: string | null;
-  setCommitMessage: (m: string) => void;
-  refresh: (repo: string) => Promise<void>;
+  setCommitMessage: (repo: string, m: string) => void;
+  /** Scan a freshly opened folder for repos, then load their status. */
+  discover: (root: string) => Promise<void>;
+  /** Re-fetch status for the already-discovered repos. */
+  refresh: () => Promise<void>;
   stage: (repo: string, paths: string[]) => Promise<void>;
   unstage: (repo: string, paths: string[]) => Promise<void>;
   discard: (repo: string, paths: string[]) => Promise<void>;
@@ -17,47 +36,75 @@ interface GitState {
   fetch: (repo: string) => Promise<void>;
 }
 
+async function loadStatuses(paths: string[]): Promise<RepoEntry[]> {
+  const entries = await Promise.all(
+    paths.map(async (path) => {
+      try {
+        const status = await ipc.git.status(path);
+        return { path, name: basename(path), status } as RepoEntry;
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return entries.filter((e): e is RepoEntry => e !== null && e.status.isRepo);
+}
+
 export const useGitStore = create<GitState>((set, get) => ({
-  status: null,
+  repos: [],
+  repoPaths: [],
+  scannedRoot: null,
   loading: false,
-  commitMessage: "",
+  commitMessages: {},
   lastError: null,
 
-  setCommitMessage: (m) => set({ commitMessage: m }),
+  setCommitMessage: (repo, m) =>
+    set((s) => ({ commitMessages: { ...s.commitMessages, [repo]: m } })),
 
-  refresh: async (repo) => {
-    if (get().loading) return;
+  discover: async (root) => {
     set({ loading: true });
     try {
-      const status = await ipc.git.status(repo);
-      set({ status, lastError: null });
+      const paths = await ipc.git.discoverRepos(root);
+      const repos = await loadStatuses(paths);
+      set({ repoPaths: paths, scannedRoot: root, repos, lastError: null });
     } catch (err) {
-      set({ lastError: String(err) });
+      set({ lastError: String(err), repos: [], repoPaths: [] });
     } finally {
       set({ loading: false });
     }
   },
 
+  refresh: async () => {
+    const { repoPaths } = get();
+    if (repoPaths.length === 0) return;
+    try {
+      const repos = await loadStatuses(repoPaths);
+      set({ repos, lastError: null });
+    } catch (err) {
+      set({ lastError: String(err) });
+    }
+  },
+
   stage: async (repo, paths) => {
     await ipc.git.stage(repo, paths);
-    await get().refresh(repo);
+    await get().refresh();
   },
 
   unstage: async (repo, paths) => {
     await ipc.git.unstage(repo, paths);
-    await get().refresh(repo);
+    await get().refresh();
   },
 
   discard: async (repo, paths) => {
     await ipc.git.discard(repo, paths);
-    await get().refresh(repo);
+    await get().refresh();
   },
 
   commit: async (repo) => {
-    const msg = get().commitMessage;
+    const msg = get().commitMessages[repo] ?? "";
     await ipc.git.commit(repo, msg);
-    set({ commitMessage: "" });
-    await get().refresh(repo);
+    set((s) => ({ commitMessages: { ...s.commitMessages, [repo]: "" } }));
+    await get().refresh();
   },
 
   push: async (repo) => {
@@ -67,7 +114,7 @@ export const useGitStore = create<GitState>((set, get) => ({
     } catch (err) {
       set({ lastError: String(err) });
     }
-    await get().refresh(repo);
+    await get().refresh();
   },
 
   pull: async (repo) => {
@@ -77,7 +124,7 @@ export const useGitStore = create<GitState>((set, get) => ({
     } catch (err) {
       set({ lastError: String(err) });
     }
-    await get().refresh(repo);
+    await get().refresh();
   },
 
   fetch: async (repo) => {
@@ -87,6 +134,6 @@ export const useGitStore = create<GitState>((set, get) => ({
     } catch (err) {
       set({ lastError: String(err) });
     }
-    await get().refresh(repo);
+    await get().refresh();
   },
 }));

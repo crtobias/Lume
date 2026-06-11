@@ -115,6 +115,53 @@ async fn is_repo(repo: &str) -> bool {
             .is_ok()
 }
 
+const SCAN_SKIP: &[&str] = &[
+    "node_modules", ".git", "target", "dist", "build", "out", ".next",
+    ".cache", "vendor", "__pycache__", ".venv", "venv", ".idea", ".vscode",
+];
+
+fn scan_repos(dir: &Path, depth: usize, max_depth: usize, out: &mut Vec<String>) {
+    if dir.join(".git").exists() {
+        if let Some(s) = dir.to_str() {
+            out.push(s.replace('\\', "/"));
+        }
+    }
+    if depth >= max_depth {
+        return;
+    }
+    let entries = match std::fs::read_dir(dir) {
+        Ok(e) => e,
+        Err(_) => return,
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if !path.is_dir() {
+            continue;
+        }
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if name.starts_with('.') || SCAN_SKIP.iter().any(|s| *s == name) {
+            continue;
+        }
+        scan_repos(&path, depth + 1, max_depth, out);
+    }
+}
+
+/// Discover every git repository at or beneath `root` (bounded depth), so a
+/// folder that contains several independent repos shows them all.
+#[tauri::command]
+pub async fn git_discover_repos(root: String) -> Result<Vec<String>, String> {
+    let root_path = Path::new(&root);
+    if !root_path.is_dir() {
+        return Ok(vec![]);
+    }
+    let mut out = Vec::new();
+    scan_repos(root_path, 0, 2, &mut out);
+    out.sort();
+    out.dedup();
+    Ok(out)
+}
+
 #[tauri::command]
 pub async fn git_status(repo: String) -> Result<GitStatus, String> {
     if !is_repo(&repo).await {
@@ -122,6 +169,17 @@ pub async fn git_status(repo: String) -> Result<GitStatus, String> {
     }
     let out = run(git(&repo).arg("status").arg("--porcelain").arg("--branch")).await?;
     Ok(parse_status(&out))
+}
+
+/// Content of a file as committed at HEAD. Returns an empty string when the
+/// path doesn't exist at HEAD (e.g. newly added / untracked files).
+#[tauri::command]
+pub async fn git_file_at_head(repo: String, path: String) -> Result<String, String> {
+    let spec = format!("HEAD:{}", path);
+    match run(git(&repo).arg("show").arg(&spec)).await {
+        Ok(content) => Ok(content),
+        Err(_) => Ok(String::new()),
+    }
 }
 
 #[tauri::command]

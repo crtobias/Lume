@@ -1,0 +1,238 @@
+.scrim {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 9vh 20px 20px;
+  background: rgba(8, 9, 11, 0.5);
+  backdrop-filter: blur(3px);
+  animation: lume-fade 0.12s ease;
+  z-index: 50;
+  overflow: auto;
+}
+
+.dialog {
+  width: 580px;
+  max-width: 92vw;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: lume-pop 0.16s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 17px;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.closeBtn:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.body {
+  padding: 22px 24px 26px;
+}
+
+.rowSetting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 18px;
+}
+
+.divided {
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.settingName {
+  font-size: 13.5px;
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.settingDesc {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* mode toggle */
+.modeToggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modeLabel {
+  font-size: 12px;
+  color: var(--faint);
+  transition: color var(--duration-fast);
+}
+
+.modeActive { color: var(--fg); }
+
+.track {
+  width: 40px;
+  height: 22px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  position: relative;
+  flex: none;
+}
+
+.knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  transition: transform 0.18s ease;
+}
+
+/* accent swatches */
+.swatches {
+  display: flex;
+  gap: 10px;
+}
+
+.swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swatchDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* gallery */
+.gallerySection {
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+}
+
+.card {
+  cursor: pointer;
+  border-radius: 11px;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  transition: transform var(--duration-fast);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.preview {
+  height: 74px;
+  display: flex;
+  flex-direction: column;
+}
+
+.previewBar {
+  height: 11px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 6px;
+}
+
+.previewDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+.previewBody {
+  flex: 1;
+  display: flex;
+}
+
+.previewRail {
+  width: 18px;
+  flex: none;
+}
+
+.previewLines {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ln {
+  height: 3px;
+  border-radius: 2px;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.cardName {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cardMode {
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

@@ -1,12 +1,13 @@
 .bar {
   grid-column: 1;
-  grid-row: 1;
-  background: var(--color-bg-activity);
+  grid-row: 2;
+  background: var(--chrome);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  border-right: 1px solid var(--color-border-subtle);
+  border-right: 1px solid var(--border);
+  padding: 10px 0;
 }
 
 .top, .bottom {
@@ -16,30 +17,31 @@
 }
 
 .item {
-  width: var(--width-activity-bar);
-  height: var(--width-activity-bar);
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-fg-muted);
+  color: var(--faint);
   position: relative;
   transition: color var(--duration-fast);
 }
 
 .item:hover {
-  color: var(--color-fg-default);
+  color: var(--muted);
 }
 
 .active {
-  color: var(--color-fg-default);
+  color: var(--fg);
 }
 
 .active::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  left: -6px;
+  top: 9px;
   width: 2px;
-  background: var(--color-fg-default);
+  height: 22px;
+  border-radius: 1px;
+  background: var(--accent);
 }

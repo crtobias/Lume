@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { useWorkspaceStore } from "../../../state/workspace";
 import { useTerminalStore } from "../../../state/terminal";
+import { useThemeStore, xtermTheme } from "../../../state/theme";
 import "@xterm/xterm/css/xterm.css";
 import styles from "./Terminal.module.css";
 
@@ -14,30 +15,6 @@ function b64ToString(b64: string): string {
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
   return new TextDecoder("utf-8", { fatal: false }).decode(bytes);
 }
-
-const theme = {
-  background: "#1e1e1e",
-  foreground: "#cccccc",
-  cursor: "#aeafad",
-  cursorAccent: "#1e1e1e",
-  selectionBackground: "#264f78",
-  black: "#000000",
-  red: "#cd3131",
-  green: "#0dbc79",
-  yellow: "#e5e510",
-  blue: "#2472c8",
-  magenta: "#bc3fbc",
-  cyan: "#11a8cd",
-  white: "#e5e5e5",
-  brightBlack: "#666666",
-  brightRed: "#f14c4c",
-  brightGreen: "#23d18b",
-  brightYellow: "#f5f543",
-  brightBlue: "#3b8eea",
-  brightMagenta: "#d670d6",
-  brightCyan: "#29b8db",
-  brightWhite: "#ffffff",
-};
 
 export function Terminal({ localKey }: { localKey: string }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
@@ -54,9 +31,9 @@ export function Terminal({ localKey }: { localKey: string }) {
     if (!hostRef.current || xtermRef.current) return;
 
     const term = new Xterm({
-      theme,
-      fontFamily: "var(--font-mono), Consolas, monospace",
-      fontSize: 13,
+      theme: xtermTheme(useThemeStore.getState()),
+      fontFamily: "'JetBrains Mono', ui-monospace, Consolas, monospace",
+      fontSize: 12.5,
       cursorBlink: true,
       allowProposedApi: true,
       scrollback: 5000,
@@ -137,6 +114,15 @@ export function Terminal({ localKey }: { localKey: string }) {
   useEffect(() => {
     fitRef.current?.fit();
   });
+
+  // Repaint the terminal palette whenever the lume theme changes.
+  useEffect(() => {
+    const unsub = useThemeStore.subscribe((s) => {
+      const term = xtermRef.current;
+      if (term) term.options.theme = xtermTheme(s);
+    });
+    return unsub;
+  }, []);
 
   return <div ref={hostRef} className={styles.host} />;
 }

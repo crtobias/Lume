@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from "react";
-import { Check, ChevronDown, ChevronRight, Plus, RefreshCw, Minus, RotateCcw } from "lucide-react";
+import { useMemo } from "react";
+import { Check, ChevronDown, ChevronRight, Plus, Minus, RotateCcw, ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { useWorkspaceStore } from "../../../state/workspace";
-import { useGitStore } from "../../../state/git";
+import { useGitStore, type RepoEntry } from "../../../state/git";
 import { useEditorStore } from "../../../state/editor";
 import type { FileChange } from "../../../lib/ipc";
 import styles from "./SourceControl.module.css";
@@ -30,37 +30,52 @@ function badgeFor(change: FileChange): { label: string; color: string } {
       ? "var(--color-git-deleted)"
       : s === "R"
       ? "var(--color-git-renamed)"
-      : "var(--color-fg-muted)";
+      : "var(--muted)";
   return { label: s, color };
 }
 
 export function SourceControl() {
   const rootPath = useWorkspaceStore((s) => s.rootPath);
-  const status = useGitStore((s) => s.status);
-  const commitMessage = useGitStore((s) => s.commitMessage);
+  const repos = useGitStore((s) => s.repos);
+  const loading = useGitStore((s) => s.loading);
+  const lastError = useGitStore((s) => s.lastError);
+
+  if (!rootPath) {
+    return <div className={styles.placeholder}>Open a folder to use Source Control.</div>;
+  }
+  if (repos.length === 0) {
+    return (
+      <div className={styles.placeholder}>
+        {loading ? "Scanning for repositories…" : "No Git repositories found in this folder."}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.root}>
+      {lastError && <div className={styles.error}>{lastError}</div>}
+      {repos.map((repo) => (
+        <RepoCard key={repo.path} repo={repo} showName={repos.length > 1} />
+      ))}
+    </div>
+  );
+}
+
+function RepoCard({ repo, showName }: { repo: RepoEntry; showName: boolean }) {
+  const commitMessage = useGitStore((s) => s.commitMessages[repo.path] ?? "");
   const setCommitMessage = useGitStore((s) => s.setCommitMessage);
-  const refresh = useGitStore((s) => s.refresh);
   const stage = useGitStore((s) => s.stage);
   const unstage = useGitStore((s) => s.unstage);
   const discard = useGitStore((s) => s.discard);
   const commit = useGitStore((s) => s.commit);
   const push = useGitStore((s) => s.push);
   const pull = useGitStore((s) => s.pull);
-  const lastError = useGitStore((s) => s.lastError);
-
-  // Poll status while panel is mounted.
-  useEffect(() => {
-    if (!rootPath) return;
-    void refresh(rootPath);
-    const t = setInterval(() => void refresh(rootPath), 2000);
-    return () => clearInterval(t);
-  }, [rootPath, refresh]);
 
   const { staged, unstaged, untracked } = useMemo(() => {
     const staged: FileChange[] = [];
     const unstaged: FileChange[] = [];
     const untracked: FileChange[] = [];
-    for (const c of status?.changes ?? []) {
+    for (const c of repo.status.changes) {
       if (c.kind === "untracked") {
         untracked.push(c);
       } else {
@@ -69,49 +84,46 @@ export function SourceControl() {
       }
     }
     return { staged, unstaged, untracked };
-  }, [status]);
-
-  if (!rootPath) {
-    return (
-      <div className={styles.placeholder}>Open a folder to use Source Control.</div>
-    );
-  }
-  if (status && !status.isRepo) {
-    return <div className={styles.placeholder}>This folder is not a Git repository.</div>;
-  }
+  }, [repo.status]);
 
   const canCommit = staged.length > 0 && commitMessage.trim().length > 0;
+  const { branch, ahead, behind } = repo.status;
 
   return (
-    <div className={styles.root}>
+    <div className={styles.repo}>
       <div className={styles.repoBar}>
-        <span className={styles.repoName}>{basename(rootPath)}</span>
+        <span className={styles.repoName}>{showName ? repo.name : basename(repo.path)}</span>
+        {branch && (
+          <span className={styles.branch} title={repo.status.upstream ?? branch}>
+            <span className={styles.branchDot} />
+            {branch}
+            {(ahead > 0 || behind > 0) && (
+              <span className={styles.sync}>
+                {behind > 0 && (<><ArrowDown size={10} strokeWidth={2} />{behind}</>)}
+                {ahead > 0 && (<><ArrowUp size={10} strokeWidth={2} />{ahead}</>)}
+              </span>
+            )}
+          </span>
+        )}
         <div className={styles.repoActions}>
-          <button className={styles.iconBtn} title="Pull" onClick={() => pull(rootPath)}>
-            <RotateCcw size={14} strokeWidth={2} />
+          <button className={styles.iconBtn} title="Pull" onClick={() => pull(repo.path)}>
+            <ArrowDown size={13} strokeWidth={2} />
           </button>
-          <button className={styles.iconBtn} title="Push" onClick={() => push(rootPath)}>
-            <ChevronRight size={14} strokeWidth={2} />
-          </button>
-          <button
-            className={styles.iconBtn}
-            title="Refresh"
-            onClick={() => refresh(rootPath)}
-          >
-            <RefreshCw size={14} strokeWidth={2} />
+          <button className={styles.iconBtn} title="Push" onClick={() => push(repo.path)}>
+            <ArrowUp size={13} strokeWidth={2} />
           </button>
         </div>
       </div>
 
       <textarea
         className={styles.commitInput}
-        placeholder="Message (Ctrl+Enter to commit)"
+        placeholder={`Message (Ctrl+Enter to commit)`}
         value={commitMessage}
-        onChange={(e) => setCommitMessage(e.target.value)}
+        onChange={(e) => setCommitMessage(repo.path, e.target.value)}
         onKeyDown={(e) => {
           if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && canCommit) {
             e.preventDefault();
-            void commit(rootPath);
+            void commit(repo.path);
           }
         }}
         rows={2}
@@ -119,44 +131,15 @@ export function SourceControl() {
       <button
         className={`${styles.commitBtn} ${!canCommit ? styles.commitBtnDisabled : ""}`}
         disabled={!canCommit}
-        onClick={() => void commit(rootPath)}
+        onClick={() => void commit(repo.path)}
       >
         <Check size={14} strokeWidth={2} />
         <span>Commit{staged.length > 0 ? ` (${staged.length})` : ""}</span>
       </button>
 
-      {lastError && <div className={styles.error}>{lastError}</div>}
-
-      <Section
-        title="Staged Changes"
-        count={staged.length}
-        files={staged}
-        action="unstage"
-        repo={rootPath}
-        onStage={stage}
-        onUnstage={unstage}
-        onDiscard={discard}
-      />
-      <Section
-        title="Changes"
-        count={unstaged.length}
-        files={unstaged}
-        action="stage"
-        repo={rootPath}
-        onStage={stage}
-        onUnstage={unstage}
-        onDiscard={discard}
-      />
-      <Section
-        title="Untracked"
-        count={untracked.length}
-        files={untracked}
-        action="stage"
-        repo={rootPath}
-        onStage={stage}
-        onUnstage={unstage}
-        onDiscard={discard}
-      />
+      <Section title="Staged Changes" count={staged.length} files={staged} action="unstage" repo={repo.path} onStage={stage} onUnstage={unstage} onDiscard={discard} />
+      <Section title="Changes" count={unstaged.length} files={unstaged} action="stage" repo={repo.path} onStage={stage} onUnstage={unstage} onDiscard={discard} />
+      <Section title="Untracked" count={untracked.length} files={untracked} action="stage" repo={repo.path} onStage={stage} onUnstage={unstage} onDiscard={discard} />
     </div>
   );
 }
@@ -174,17 +157,14 @@ interface SectionProps {
 
 function Section({ title, count, files, action, repo, onStage, onUnstage, onDiscard }: SectionProps) {
   const [open, setOpen] = useState(true);
+  const openDiff = useEditorStore((s) => s.openDiff);
   const openFile = useEditorStore((s) => s.openFile);
   const Chevron = open ? ChevronDown : ChevronRight;
   if (count === 0) return null;
 
   return (
     <div className={styles.section}>
-      <div
-        className={styles.sectionHeader}
-        onClick={() => setOpen((o) => !o)}
-        role="button"
-      >
+      <div className={styles.sectionHeader} onClick={() => setOpen((o) => !o)} role="button">
         <Chevron size={14} strokeWidth={2} />
         <span className={styles.sectionTitle}>{title}</span>
         <span className={styles.sectionCount}>{count}</span>
@@ -198,52 +178,30 @@ function Section({ title, count, files, action, repo, onStage, onUnstage, onDisc
               <li
                 key={c.path + action}
                 className={styles.row}
+                onClick={() => openDiff(repo, c.path)}
                 onDoubleClick={() => void openFile(fullPath)}
-                title={c.path}
+                title={`${c.path} — click to view diff`}
               >
                 <span className={styles.rowName}>{basename(c.path)}</span>
                 <span className={styles.rowPath}>{c.path}</span>
                 <div className={styles.rowActions}>
                   {action === "stage" && c.kind === "tracked" && (
-                    <button
-                      className={styles.rowIcon}
-                      title="Discard Changes"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        void onDiscard(repo, [c.path]);
-                      }}
-                    >
+                    <button className={styles.rowIcon} title="Discard Changes" onClick={(e) => { e.stopPropagation(); void onDiscard(repo, [c.path]); }}>
                       <RotateCcw size={12} strokeWidth={2} />
                     </button>
                   )}
                   {action === "stage" && (
-                    <button
-                      className={styles.rowIcon}
-                      title="Stage Changes"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        void onStage(repo, [c.path]);
-                      }}
-                    >
+                    <button className={styles.rowIcon} title="Stage Changes" onClick={(e) => { e.stopPropagation(); void onStage(repo, [c.path]); }}>
                       <Plus size={12} strokeWidth={2} />
                     </button>
                   )}
                   {action === "unstage" && (
-                    <button
-                      className={styles.rowIcon}
-                      title="Unstage Changes"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        void onUnstage(repo, [c.path]);
-                      }}
-                    >
+                    <button className={styles.rowIcon} title="Unstage Changes" onClick={(e) => { e.stopPropagation(); void onUnstage(repo, [c.path]); }}>
                       <Minus size={12} strokeWidth={2} />
                     </button>
                   )}
                 </div>
-                <span className={styles.badge} style={{ color }}>
-                  {label}
-                </span>
+                <span className={styles.badge} style={{ color }}>{label}</span>
               </li>
             );
           })}

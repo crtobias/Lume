@@ -1,45 +1,75 @@
 :root {
-  --color-bg-editor: #1e1e1e;
-  --color-bg-sidebar: #252526;
-  --color-bg-activity: #333333;
-  --color-bg-panel: #1e1e1e;
-  --color-bg-tab-inactive: #2d2d2d;
-  --color-bg-tab-active: #1e1e1e;
-  --color-bg-statusbar: #007acc;
-  --color-bg-statusbar-nofolder: #68217a;
+  /* ── Design tokens (Graphite default; overwritten at runtime by the theme store) ── */
+  --bg: #15171b;
+  --panel: #14161a;
+  --chrome: #101216;
+  --border: #23262d;
+  --fg: #c9ced6;
+  --muted: #7e848f;
+  --faint: #4a505a;
+  --hover: rgba(255, 255, 255, 0.045);
+  --active: rgba(255, 255, 255, 0.026);
+  --accent: #b89ce0;
+  --sel: rgba(184, 156, 224, 0.18);
 
-  --color-fg-default: #cccccc;
-  --color-fg-muted: #858585;
-  --color-fg-statusbar: #ffffff;
+  /* syntax tones */
+  --kw: #b89ce0;
+  --str: #9bbf9e;
+  --fn: #8fb3d9;
+  --num: #cdb088;
+  --com: #565c66;
+  --type: #c3a8e4;
+  --prompt: #8fb3d9;
 
-  --color-border: #3e3e42;
-  --color-border-subtle: #2d2d30;
-  --color-divider: #1e1e1e;
+  /* ── Aliases so existing component CSS keeps resolving against the active theme ── */
+  --color-bg-editor: var(--bg);
+  --color-bg-sidebar: var(--panel);
+  --color-bg-activity: var(--chrome);
+  --color-bg-panel: var(--bg);
+  --color-bg-tab-inactive: var(--chrome);
+  --color-bg-tab-active: var(--bg);
+  --color-bg-statusbar: var(--chrome);
 
-  --color-accent: #007acc;
-  --color-accent-hover: #094771;
-  --color-list-hover: #2a2d2e;
-  --color-list-focused: #094771;
-  --color-list-selected: #37373d;
+  --color-fg-default: var(--fg);
+  --color-fg-muted: var(--muted);
+  --color-fg-statusbar: var(--muted);
 
-  --color-git-modified: #e2c08d;
-  --color-git-added: #81b88b;
-  --color-git-deleted: #c74e39;
-  --color-git-untracked: #73c991;
-  --color-git-renamed: #75beff;
-  --color-git-conflict: #e4676b;
+  --color-border: var(--border);
+  --color-border-subtle: var(--border);
+  --color-divider: var(--bg);
 
-  --width-activity-bar: 48px;
-  --width-sidebar: 240px;
-  --height-statusbar: 22px;
-  --height-tab: 35px;
-  --height-panel: 240px;
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--hover);
+  --color-list-hover: var(--hover);
+  --color-list-focused: var(--sel);
+  --color-list-selected: var(--sel);
 
-  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", Consolas, "Courier New", monospace;
-  --font-size-ui: 13px;
+  /* git decoration colors (tonal, kept across themes) */
+  --color-git-modified: var(--num);
+  --color-git-added: var(--str);
+  --color-git-deleted: #c87d7d;
+  --color-git-untracked: var(--str);
+  --color-git-renamed: var(--fn);
+  --color-git-conflict: #d08a8a;
+
+  /* ── Dimensions ── */
+  --height-titlebar: 42px;
+  --width-activity-bar: 52px;
+  --width-sidebar: 236px;
+  --height-statusbar: 26px;
+  --height-tab: 40px;
+  --height-panel: 198px;
+
+  /* ── Typography ── */
+  --font-ui: "Hanken Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+  --font-size-ui: 14px;
   --font-size-mono: 13px;
-  --font-size-statusbar: 12px;
+  --font-size-statusbar: 11px;
 
-  --duration-fast: 80ms;
+  --duration-fast: 120ms;
 }
+
+@keyframes lume-blink { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes lume-pop { from { opacity: 0; transform: translateY(6px) scale(0.99); } to { opacity: 1; transform: none; } }
+@keyframes lume-fade { from { opacity: 0; } to { opacity: 1; } }

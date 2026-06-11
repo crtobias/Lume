@@ -1,0 +1,70 @@
+.wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.header {
+  height: 34px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--chrome);
+}
+
+.name {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--fg);
+}
+
+.sides {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.arrow { color: var(--faint); }
+
+.error {
+  margin: 10px 16px;
+  padding: 8px 10px;
+  background: rgba(208, 138, 138, 0.12);
+  color: var(--color-git-conflict);
+  font-size: 12px;
+  border-radius: 7px;
+  font-family: var(--font-mono);
+}
+
+.host {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.host :global(.cm-mergeView),
+.host :global(.cm-mergeViewEditors) {
+  height: 100%;
+}
+
+.host :global(.cm-mergeView .cm-editor) {
+  height: 100%;
+}
+
+.host :global(.cm-mergeView .cm-editor.cm-focused) {
+  outline: none;
+}
+
+/* divider between the two panes */
+.host :global(.cm-merge-a) {
+  border-right: 1px solid var(--border);
+}

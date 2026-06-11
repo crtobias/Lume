@@ -2,6 +2,8 @@ import { Files, GitBranch, Search, Settings } from "lucide-react";
 import styles from "./ActivityBar.module.css";
 import { useUIStore } from "../../state/ui";
 
+const ICON_SIZE = 20;
+
 const items = [
   { id: "explorer" as const, icon: Files, label: "Explorer" },
   { id: "search" as const, icon: Search, label: "Search" },
@@ -11,6 +13,7 @@ const items = [
 export function ActivityBar() {
   const view = useUIStore((s) => s.sidebarView);
   const setView = useUIStore((s) => s.setSidebarView);
+  const toggleOverlay = useUIStore((s) => s.toggleOverlay);
 
   return (
     <div className={styles.bar}>
@@ -26,14 +29,19 @@ export function ActivityBar() {
               onClick={() => setView(it.id)}
               aria-label={it.label}
             >
-              <Icon size={24} strokeWidth={1.5} />
+              <Icon size={ICON_SIZE} strokeWidth={1.4} />
             </button>
           );
         })}
       </div>
       <div className={styles.bottom}>
-        <button className={styles.item} title="Settings" aria-label="Settings">
-          <Settings size={24} strokeWidth={1.5} />
+        <button
+          className={styles.item}
+          title="Settings (Ctrl+,)"
+          aria-label="Settings"
+          onClick={() => toggleOverlay("settings")}
+        >
+          <Settings size={ICON_SIZE} strokeWidth={1.4} />
         </button>
       </div>
     </div>

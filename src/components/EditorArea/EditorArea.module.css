@@ -1,5 +1,5 @@
 .area {
-  background: var(--color-bg-editor);
+  background: var(--bg);
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -14,17 +14,19 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: var(--color-fg-muted);
+  color: var(--muted);
 }
 
 .brand {
-  font-size: 56px;
-  font-weight: 200;
-  letter-spacing: 0.04em;
-  color: var(--color-fg-default);
-  opacity: 0.4;
+  font-size: 54px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: lowercase;
+  color: var(--fg);
+  opacity: 0.35;
 }
 
 .hint {
   font-size: var(--font-size-ui);
+  color: var(--faint);
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Transaction } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { useEditorStore } from "../../../state/editor";
 import { baseExtensions, languageCompartment } from "../../../lib/cm/setup";
@@ -18,13 +18,31 @@ export function Editor() {
   );
   const updateContent = useEditorStore((s) => s.updateContent);
 
-  // Create the view once, then swap state per tab.
+  // Create the view once.
   useEffect(() => {
     if (!hostRef.current || viewRef.current) return;
-    const view = new EditorView({
-      parent: hostRef.current,
-      state: EditorState.create({
-        doc: "",
+    const view = new EditorView({ parent: hostRef.current });
+    viewRef.current = view;
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+      lastPathRef.current = null;
+    };
+  }, []);
+
+  // Switch documents when the active tab changes.
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !tab) return;
+
+    if (lastPathRef.current !== tab.path) {
+      lastPathRef.current = tab.path;
+      lastContentRef.current = tab.content;
+
+      // Build a FRESH state per file: each document gets its own clean undo
+      // history, so Ctrl+Z can never undo past the file's loaded content.
+      const state = EditorState.create({
+        doc: tab.content,
         extensions: [
           ...baseExtensions(),
           languageCompartment.of([]),
@@ -37,41 +55,24 @@ export function Editor() {
             updateContent(path, text);
           }),
         ],
-      }),
-    });
-    viewRef.current = view;
-    return () => {
-      view.destroy();
-      viewRef.current = null;
-    };
-  }, [updateContent]);
-
-  // Switch documents when active tab changes.
-  useEffect(() => {
-    const view = viewRef.current;
-    if (!view || !tab) return;
-
-    if (lastPathRef.current !== tab.path) {
-      lastPathRef.current = tab.path;
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: tab.content },
       });
-      lastContentRef.current = tab.content;
+      view.setState(state);
 
       // Lazy-load language for this file.
       languageFor(tab.path).then((ext) => {
         if (lastPathRef.current !== tab.path) return;
-        view.dispatch({
-          effects: languageCompartment.reconfigure(ext ?? []),
-        });
+        view.dispatch({ effects: languageCompartment.reconfigure(ext ?? []) });
       });
     } else if (tab.content !== lastContentRef.current) {
+      // Content changed outside the editor (e.g. reload): replace the doc
+      // WITHOUT adding it to the undo history.
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: tab.content },
+        annotations: Transaction.addToHistory.of(false),
       });
       lastContentRef.current = tab.content;
     }
-  }, [tab]);
+  }, [tab, updateContent]);
 
   if (!activePath) return null;
   return <div ref={hostRef} className={styles.host} />;

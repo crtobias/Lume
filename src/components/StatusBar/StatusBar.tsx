@@ -1,35 +1,38 @@
-import { useEffect } from "react";
-import { GitBranch, RefreshCw, PanelBottom } from "lucide-react";
+import { PanelBottom, GitBranch } from "lucide-react";
 import { useGitStore } from "../../state/git";
-import { useWorkspaceStore } from "../../state/workspace";
+import { useEditorStore } from "../../state/editor";
 import { useUIStore } from "../../state/ui";
+import { useThemeStore, activeTheme } from "../../state/theme";
 import styles from "./StatusBar.module.css";
 
 export function StatusBar() {
-  const rootPath = useWorkspaceStore((s) => s.rootPath);
-  const status = useGitStore((s) => s.status);
-  const refresh = useGitStore((s) => s.refresh);
+  const repos = useGitStore((s) => s.repos);
+  const activePath = useEditorStore((s) => s.activePath);
   const panelOpen = useUIStore((s) => s.panelOpen);
   const togglePanel = useUIStore((s) => s.togglePanel);
+  const mode = useThemeStore((s) => s.mode);
+  const lastDark = useThemeStore((s) => s.lastDark);
+  const lastLight = useThemeStore((s) => s.lastLight);
 
-  useEffect(() => {
-    if (!rootPath) return;
-    void refresh(rootPath);
-    const t = setInterval(() => void refresh(rootPath), 5000);
-    return () => clearInterval(t);
-  }, [rootPath, refresh]);
+  // Pick the repo that owns the active file, else the first discovered repo.
+  const norm = activePath?.replace(/\\/g, "/") ?? null;
+  const primary =
+    (norm
+      ? repos.find((r) => norm.startsWith(r.path.replace(/\\/g, "/").replace(/\/+$/, "") + "/"))
+      : null) ?? repos[0] ?? null;
 
-  const branch = status?.branch ?? null;
-  const changes = status?.changes.length ?? 0;
-  const ahead = status?.ahead ?? 0;
-  const behind = status?.behind ?? 0;
+  const branch = primary?.status.branch ?? null;
+  const changes = primary?.status.changes.length ?? 0;
+  const ahead = primary?.status.ahead ?? 0;
+  const behind = primary?.status.behind ?? 0;
+  const themeName = activeTheme({ mode, lastDark, lastLight }).name;
 
   return (
     <footer className={styles.bar}>
       <div className={styles.left}>
-        {branch && (
-          <span className={styles.item} title={status?.upstream ?? branch}>
-            <GitBranch size={13} strokeWidth={2} />
+        {primary && branch && (
+          <span className={styles.item} title={primary.status.upstream ?? branch}>
+            <span className={styles.dot} />
             <span>{branch}</span>
             {(ahead > 0 || behind > 0) && (
               <span className={styles.sync}>
@@ -39,10 +42,15 @@ export function StatusBar() {
             )}
           </span>
         )}
-        {changes > 0 && (
-          <span className={styles.item}>
-            <RefreshCw size={13} strokeWidth={2} />
-            <span>{changes}</span>
+        {primary && (
+          <span className={`${styles.item} ${styles.faint}`}>
+            {changes > 0 ? `± ${changes}` : "✓ 0"}
+          </span>
+        )}
+        {repos.length > 1 && (
+          <span className={`${styles.item} ${styles.faint}`} title={`${repos.length} repositories`}>
+            <GitBranch size={11} strokeWidth={2} />
+            <span>{repos.length} repos</span>
           </span>
         )}
       </div>
@@ -54,12 +62,17 @@ export function StatusBar() {
           aria-label="Toggle Panel"
           aria-pressed={panelOpen}
         >
-          <PanelBottom size={13} strokeWidth={2} />
+          <PanelBottom size={11} strokeWidth={2} />
           <span>Terminal</span>
         </button>
+        <span className={styles.faint}>·</span>
         <span className={styles.item}>UTF-8</span>
-        <span className={styles.item}>LF</span>
+        <span className={styles.faint}>·</span>
+        <span className={styles.item}>Spaces: 2</span>
+        <span className={styles.faint}>·</span>
         <span className={styles.item}>Ln 1, Col 1</span>
+        <span className={styles.faint}>·</span>
+        <span className={styles.theme}>{themeName}</span>
       </div>
     </footer>
   );

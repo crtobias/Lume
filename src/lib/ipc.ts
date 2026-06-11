@@ -46,7 +46,10 @@ export const ipc = {
     detectShells: () => invoke<ShellInfo[]>("detect_shells"),
   },
   git: {
+    discoverRepos: (root: string) => invoke<string[]>("git_discover_repos", { root }),
     status: (repo: string) => invoke<GitStatus>("git_status", { repo }),
+    fileAtHead: (repo: string, path: string) =>
+      invoke<string>("git_file_at_head", { repo, path }),
     stage: (repo: string, paths: string[]) => invoke<void>("git_stage", { repo, paths }),
     unstage: (repo: string, paths: string[]) => invoke<void>("git_unstage", { repo, paths }),
     discard: (repo: string, paths: string[]) => invoke<void>("git_discard", { repo, paths }),

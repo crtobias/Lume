@@ -1,108 +1,153 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 0 4px 8px 4px;
+  gap: 6px;
+  padding: 4px 4px 12px 4px;
 }
 
 .placeholder {
-  padding: 8px 12px;
-  color: var(--color-fg-muted);
-  font-size: var(--font-size-ui);
+  padding: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* one card per discovered repo */
+.repo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px 4px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.repo:first-child {
+  border-top: none;
 }
 
 .repoBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
+  gap: 8px;
+  padding: 0 6px;
 }
 
 .repoName {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--color-fg-muted);
+  font-weight: 600;
+  color: var(--fg);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: none;
+  max-width: 110px;
+}
+
+.branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branchDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+.sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: 4px;
+  color: var(--accent);
 }
 
 .repoActions {
   display: flex;
   gap: 2px;
+  margin-left: auto;
 }
 
 .iconBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  color: var(--color-fg-muted);
-  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  color: var(--muted);
+  border-radius: 6px;
+  transition: background var(--duration-fast), color var(--duration-fast);
 }
 
 .iconBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-fg-default);
+  background: var(--hover);
+  color: var(--fg);
 }
 
 .commitInput {
-  margin: 0 4px;
-  padding: 6px 8px;
-  background: #3c3c3c;
-  color: var(--color-fg-default);
-  border: 1px solid var(--color-border);
-  border-radius: 2px;
+  margin: 0 6px;
+  padding: 8px 10px;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   font-family: var(--font-ui);
-  font-size: var(--font-size-ui);
+  font-size: 13px;
   resize: vertical;
-  min-height: 56px;
+  min-height: 52px;
 }
 
-.commitInput:focus {
-  border-color: var(--color-accent);
-}
+.commitInput::placeholder { color: var(--faint); }
+.commitInput:focus { border-color: var(--accent); }
 
 .commitBtn {
-  margin: 0 4px;
+  margin: 0 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--color-accent);
-  color: #fff;
-  border-radius: 2px;
-  font-size: var(--font-size-ui);
-  transition: background var(--duration-fast);
+  gap: 7px;
+  padding: 7px 10px;
+  background: var(--accent);
+  color: var(--chrome);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: opacity var(--duration-fast);
 }
 
-.commitBtn:hover {
-  background: #1a8ad6;
-}
+.commitBtn:hover { opacity: 0.9; }
 
 .commitBtnDisabled {
-  background: #4a4a4a;
+  background: transparent;
+  border: 1px solid var(--border);
   cursor: not-allowed;
-  color: var(--color-fg-muted);
+  color: var(--faint);
 }
 
-.commitBtnDisabled:hover {
-  background: #4a4a4a;
-}
+.commitBtnDisabled:hover { opacity: 1; }
 
 .error {
-  margin: 0 8px;
-  padding: 6px 8px;
-  background: rgba(199, 78, 57, 0.12);
+  margin: 0 6px;
+  padding: 7px 9px;
+  background: rgba(208, 138, 138, 0.12);
   color: var(--color-git-conflict);
   font-size: 11px;
-  border-radius: 2px;
+  border-radius: 7px;
   white-space: pre-wrap;
   word-break: break-word;
+  font-family: var(--font-mono);
 }
 
 .section {
@@ -113,32 +158,29 @@
 .sectionHeader {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: 5px;
+  padding: 5px 6px;
   cursor: pointer;
-  color: var(--color-fg-default);
+  color: var(--muted);
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-weight: 600;
   user-select: none;
+  border-radius: 5px;
 }
 
-.sectionHeader:hover {
-  background: var(--color-list-hover);
-}
+.sectionHeader:hover { background: var(--hover); }
 
-.sectionTitle {
-  flex: 1;
-}
+.sectionTitle { flex: 1; }
 
 .sectionCount {
-  background: rgba(255, 255, 255, 0.16);
-  color: var(--color-fg-default);
+  background: var(--sel);
+  color: var(--fg);
   border-radius: 8px;
   padding: 0 6px;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   height: 16px;
   display: inline-flex;
   align-items: center;
@@ -155,17 +197,17 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
+  gap: 6px;
+  padding: 4px 8px;
   cursor: default;
-  color: var(--color-fg-default);
-  font-size: var(--font-size-ui);
+  color: var(--fg);
+  font-size: 13px;
+  font-family: var(--font-mono);
   position: relative;
+  border-radius: 5px;
 }
 
-.row:hover {
-  background: var(--color-list-hover);
-}
+.row:hover { background: var(--hover); }
 
 .rowName {
   grid-column: 1;
@@ -178,7 +220,7 @@
   grid-column: 1;
   grid-row: 2;
   font-size: 10px;
-  color: var(--color-fg-muted);
+  color: var(--faint);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -191,29 +233,28 @@
   gap: 2px;
 }
 
-.row:hover .rowActions {
-  display: inline-flex;
-}
+.row:hover .rowActions { display: inline-flex; }
 
 .rowIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  color: var(--color-fg-muted);
-  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  border-radius: 5px;
 }
 
 .rowIcon:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-fg-default);
+  background: var(--hover);
+  color: var(--fg);
 }
 
 .badge {
   grid-column: 3;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 11px;
-  width: 18px;
+  width: 16px;
   text-align: center;
+  font-family: var(--font-mono);
 }
